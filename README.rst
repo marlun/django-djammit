@@ -23,7 +23,8 @@ and files which Djammit should add to the specific packages.::
     }
 
 Now you need to add ``{% include_javascript core %}`` for Djammit to load the package.
-When Debug = True Djammit will run Django's management command ``collectstatic`` on
+When Debug = True the include_javascript template tag will render all of the included
+javascript include tags. It will also run Django's management command ``collectstatic`` on
 every request which will move changed files to your static root folder.
 
 As you can see in the above example the last pattern will include javascript templates
