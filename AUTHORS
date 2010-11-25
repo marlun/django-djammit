@@ -3,6 +3,7 @@ Primary authors:
 * Martin Lundberg
 
 Thanks to Jeremy Ashkenas for creating backbone.js and Jammit which inspired me to create Djammit.
-A lot of the code was made by looking at how Jeremy did things in Jammit and Ruby.
+A lot of the code was made by looking at how Jeremy did things in Jammit and Ruby and translating
+it to Python and Django.
 
 Thanks to Django developers for creating the Django framework.
