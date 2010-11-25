@@ -12,6 +12,6 @@ STATIC_ROOT = settings.STATIC_ROOT
 
 JST_EXTENSION = getattr(settings, 'JST_EXTENSION', '.jst')
 
-JST_NAMESPACE = getattr(settings, 'JST_NAMESPACE', 'JST')
+JST_NAMESPACE = getattr(settings, 'JST_NAMESPACE', 'window.JST')
 
 JAVASCRIPTS = getattr(settings, 'JAVASCRIPTS', {})

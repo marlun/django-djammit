@@ -2,10 +2,5 @@
 django-djamit
 =============
 
-Handling the JavaScript in your Django project for you.
-
-Requirements
-============
-
-* Python
-* Django
+A very basic way of handling javascript templates and including javascript
+include tags in your django apps.

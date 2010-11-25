@@ -1,88 +1,60 @@
 import os
-import re
 from django import template
 from django.core import management
-from djammit.finders import filefinder
 from djammit import settings
+from djammit.finders import filefinder
+from djammit.compressor import compile_js
+from djammit.utils import javascript_include_tag, remove_dups
 
 register = template.Library()
 
 class JavaScriptAssetsNode(template.Node):
 
-    def __init__(self, compiled_js):
-        self.compiled_js = compiled_js
+    def __init__(self, tags):
+        self.tags = tags
 
     def render(self, context):
-        return self.compiled_js
+        return self.tags
 
 
-def get_template_name(path, base_path):
-    extension = settings.JST_EXTENSION
-    if not base_path:
-        return os.path.basename(path)
-    return re.sub(base_path + '(.*)' + extension, r"\1", path)
+def pack(compiled, package):
+    f = open(os.path.join(settings.STATIC_ROOT, package + ".js"), 'w')
+    f.write(compiled)
 
-def compile_jst(paths):
-    compiled = []
-    namespace = settings.JST_NAMESPACE
-    base_path = os.path.commonprefix(paths)
-    for path in paths:
-        content = open(path).read()
-        content = content.replace('\n', '').replace("'", "\\\'")
-        name = get_template_name(path, base_path)
-        compiled.append(namespace + "['" + name + "'] = _.template('" + content + "');")
-    # TODO Clean this shit up
-    # JST file constants.
-    JST_START = "(function(){"
-    JST_END = "})();"
-    setup_namespace = "window.JST = window.JST || {};"
-    compiled = JST_START + setup_namespace + "".join(compiled) + JST_END
-    return compiled
-
-def compile_javascript(paths):
-    static_url = settings.STATIC_URL
-    static_root = settings.STATIC_ROOT
-    if not static_root[-1] == '/':
-        static_root += '/'
-    compiled = []
-    for path in paths:
-        path = path.replace(static_root, '')
-        compiled.append('<script src="' + static_url + path + '"></script>')
-    # Temp hack:
-    compiled.append('<script src="' + static_url + 'core.js"></script>')
-    return "\n".join(compiled)
-
-def remove_dups(paths):
-    seen = set()
-    unique = []
-    for path in paths:
-        if path not in seen:
-            seen.add(path)
-            unique.append(path)
-    return unique
-
-def get_paths(packages):
-
-    paths = []
-
+def compile_packages(packages):
     for package in packages:
-        patterns = settings.JAVASCRIPTS[package]
-        for pattern in patterns:
-            paths.extend(filefinder(pattern))
+        paths = get_paths(package)
+        compiled = compile_js(paths)
+        pack(compiled, package)
 
-    paths = remove_dups(paths)
+def get_paths(package):
+    paths = []
+    patterns = settings.JAVASCRIPTS[package]
+    for pattern in patterns:
+        paths.extend(filefinder(pattern))
+
+    return remove_dups(paths)
+
+def get_urls_for(package):
+    urls = []
+    paths = get_paths(package)
     scripts = [path for path in paths if os.path.splitext(path)[1] == '.js']
+    scripts = map(lambda s: s.replace(settings.STATIC_ROOT + '/', ''), scripts)
+    for path in scripts:
+        urls.append(settings.STATIC_URL + path)
     templates = [path for path in paths if os.path.splitext(path)[1] == '.jst']
+    if len(templates) > 0:
+        urls.append(settings.STATIC_URL + package + ".js")
+    return urls
 
-    return (scripts, templates)
+def get_tags(packages):
+    urls = []
+    for package in packages:
+        urls += get_urls_for(package)
+    return javascript_include_tag(urls)
 
 def run_collectstatic():
     management.call_command('collectstatic', interactive=False)
-
-def package(compiled_jst):
-    path = os.path.join(settings.STATIC_ROOT, 'core.js')
-    f = open(path, 'w')
-    f.write(compiled_jst)
 
 def validate_packages(packages):
     for package in packages:
@@ -93,11 +65,14 @@ def include_javascript(parser, token):
     bits = token.contents.split()
     validate_packages(bits[1:])
     packages = bits[1:] if len(bits) > 1 else settings.JAVASCRIPTS.keys()
+
     run_collectstatic()
-    scripts, templates = get_paths(packages)
-    compiled_js = compile_javascript(scripts)
-    compiled_jst = compile_jst(templates)
-    package(compiled_jst)
-    return JavaScriptAssetsNode(compiled_js)
+
+    compile_packages(packages)
+
+    tags = get_tags(packages)
+
+    return JavaScriptAssetsNode(tags)
+
 include_javascript = register.tag(include_javascript)
 
