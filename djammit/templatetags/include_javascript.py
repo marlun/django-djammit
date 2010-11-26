@@ -5,6 +5,7 @@ from djammit import settings
 from djammit.finders import filefinder
 from djammit.compressor import compile_assets
 from djammit.utils import javascript_include_tag
+from djammit.exceptions import ConfigurationError
 
 register = template.Library()
 
@@ -60,7 +61,7 @@ def run_collectstatic():
 def validate_packages(packages):
     for package in packages:
         if package not in settings.JAVASCRIPTS.keys():
-            raise Exception("%s is not in your JAVASCRIPTS setting.", package)
+            raise ConfigurationError("%s is not in your JAVASCRIPTS setting.", package)
 
 def include_javascript(parser, token):
     bits = token.contents.split()
