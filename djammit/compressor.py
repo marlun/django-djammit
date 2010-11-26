@@ -1,5 +1,4 @@
 import os
-import re
 
 from djammit import settings
 
@@ -9,8 +8,8 @@ JST_END = "})();"
 def readfile(path):
     return open(path, 'r').read()
 
-def concatenate(paths):
-    return map(readfile, paths)
+def compile_js(paths):
+    return "".join(map(readfile, paths))
 
 def get_template_name(path, base_path):
     extension = settings.JST_EXTENSION
@@ -52,14 +51,27 @@ def compile_jst(paths):
     # JST file constants.
     return JST_START + namespace_setup + " ".join(compiled) + JST_END
 
-def compile_js(paths):
+def compile_assets(paths):
     compiled = ""
-    scripts = [path for path in paths if os.path.splitext(path)[1] == '.js']
-    templates = [path for path in paths if os.path.splitext(path)[1] == '.jst']
-    if settings.DEBUG:
-        compiled += compile_jst(templates)
-    else:
-        compiled += concatenate(scripts) + compile_jst(templates)
-    print compiled
+
+    # separate the different kinds of assets
+    assets = {
+        '.js': [],
+        '.css': [],
+        settings.JST_EXTENSION: [],
+    }
+
+    for path in paths:
+        for t in assets.keys():
+            if path.endswith(t):
+                assets[t].append(path)
+                break
+
+    # compile templates
+    compiled += compile_jst(assets[settings.JST_EXTENSION])
+
+    # compile scripts
+    if not settings.DEBUG:
+        compiled += compile_js(assets['.js'])
     return compiled
 

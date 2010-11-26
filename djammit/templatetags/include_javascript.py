@@ -3,7 +3,7 @@ from django import template
 from django.core import management
 from djammit import settings
 from djammit.finders import filefinder
-from djammit.compressor import compile_js
+from djammit.compressor import compile_assets
 from djammit.utils import javascript_include_tag, remove_dups
 
 register = template.Library()
@@ -24,7 +24,7 @@ def pack(compiled, package):
 def compile_packages(packages):
     for package in packages:
         paths = get_paths(package)
-        compiled = compile_js(paths)
+        compiled = compile_assets(paths)
         pack(compiled, package)
 
 def get_paths(package):
