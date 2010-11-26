@@ -33,3 +33,7 @@ if not hasattr(settings, 'DJAMMIT_COLLECT_COMMAND'):
 else:
     COLLECT_COMMAND = settings.DJAMMIT_COLLECT_COMMAND
 
+#
+# Allow the user to override the default output directory
+#
+ROOT = getattr(settings, 'DJAMMIT_ROOT', STATIC_ROOT)

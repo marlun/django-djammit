@@ -21,7 +21,7 @@ class JavaScriptAssetsNode(template.Node):
 
 
 def pack(compiled, package):
-    f = open(os.path.join(settings.STATIC_ROOT, package + ".js"), 'w')
+    f = open(os.path.join(ROOT, package + ".js"), 'w')
     f.write(compiled)
 
 def compile_packages(packages):
