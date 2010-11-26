@@ -17,6 +17,10 @@ JST_NAMESPACE = getattr(settings, 'JST_NAMESPACE', 'window.JST')
 
 JAVASCRIPTS = getattr(settings, 'JAVASCRIPTS', {})
 
+# no bundled template function, so we might as well use Underscore's.
+# set to False to completely avoid that step
+JST_FUNCTION = getattr(settings, 'JST_FUNCTION', '_.template')
+
 #
 # Add a setting to use a collect command and make the default a bit cleverer
 #

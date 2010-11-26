@@ -14,23 +14,39 @@ def concatenate(paths):
 
 def get_template_name(path, base_path):
     extension = settings.JST_EXTENSION
+
     if not base_path:
         return os.path.basename(path)
     return re.sub(base_path + '(.*)' + extension, r"\1", path)
 
 def compile_jst(paths):
-    compiled = []
-    namespace = settings.JST_NAMESPACE
+    bits = {
+        'namespace': settings.JST_NAMESPACE,
+    }
+    namespace_setup = "%(namespace)s = %(namespace)s || {};" % bits
+
+    # do we generate a wrapper function or just pass the string along?
+    if settings.JST_FUNCTION:
+        bits['template_func'] = settings.JST_FUNCTION
+        format = "%(namespace)s['%(name)s'] = %(template_func)s('%(template)s');"
+    else:
+        format = "%(namespace)s['%(name)s'] = '%(template)s';"
+
     base_path = os.path.commonprefix(paths)
+
+    compiled = []
     for path in paths:
-        content = open(path).read()
-        content = content.replace('\n', '').replace("'", "\\\'")
-        name = get_template_name(path, base_path)
-        compiled.append(namespace + "['" + name + "'] = _.template('" + content + "');")
+        f = open(path)
+        try:
+            bits['template'] = f.read().replace('\n', '').replace("'", r"\'")
+            bits['name'] = get_template_name(path, base_path)
+
+            compiled.append(format % bits)
+        finally:
+            f.close()
+
     # JST file constants.
-    setup_namespace = "%s = %s || {};" % (settings.JST_NAMESPACE, settings.JST_NAMESPACE)
-    compiled = JST_START + setup_namespace + "".join(compiled) + JST_END
-    return compiled
+    return JST_START + namespace_setup + " ".join(compiled) + JST_END
 
 def compile_js(paths):
     compiled = ""
