@@ -36,4 +36,4 @@ else:
 #
 # Allow the user to override the default output directory
 #
-ROOT = getattr(settings, 'DJAMMIT_ROOT', STATIC_ROOT)
+PACKAGE_PATH = getattr(settings, 'DJAMMIT_PACKAGE_PATH', STATIC_ROOT)

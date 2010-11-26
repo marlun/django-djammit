@@ -6,7 +6,7 @@ from djammit.finders import filefinder
 from djammit.compressor import compile_assets
 from djammit.utils import javascript_include_tag, remove_dups
 
-from djammit.settings import ROOT, JAVASCRIPTS, TEMPLATE_EXTENSION, \
+from djammit.settings import PACKAGE_PATH, JAVASCRIPTS, TEMPLATE_EXTENSION, \
     STATIC_ROOT, STATIC_URL, COLLECT_COMMAND
 
 register = template.Library()
@@ -21,7 +21,7 @@ class JavaScriptAssetsNode(template.Node):
 
 
 def pack(compiled, package):
-    f = open(os.path.join(ROOT, package + ".js"), 'w')
+    f = open(os.path.join(PACKAGE_PATH, package + ".js"), 'w')
     f.write(compiled)
 
 def compile_packages(packages):
@@ -60,9 +60,9 @@ def get_tags(packages):
     return javascript_include_tag(urls)
 
 def run_collectstatic():
-    # ensure ROOT exists, in case it's used by staticfiles
-    if not os.path.exists(ROOT):
-        os.mkdir(ROOT)
+    # ensure PACKAGE_PATH exists, in case it's used by staticfiles
+    if not os.path.exists(PACKAGE_PATH):
+        os.mkdir(PACKAGE_PATH)
 
     management.call_command(COLLECT_COMMAND, interactive=False)
 
