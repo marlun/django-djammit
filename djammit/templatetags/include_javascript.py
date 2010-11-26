@@ -1,11 +1,11 @@
 import os
 from django import template
 from django.core import management
+from django.core.exceptions import ImproperlyConfigured
 from djammit import settings
 from djammit.finders import filefinder
 from djammit.compressor import compile_assets
 from djammit.utils import javascript_include_tag, remove_dups
-from djammit.exceptions import ConfigurationError
 
 register = template.Library()
 
@@ -63,8 +63,8 @@ def run_collectstatic():
 
 def validate_packages(packages):
     for package in packages:
-        if package not in settings.JAVASCRIPTS.keys():
-            raise ConfigurationError("%s is not in your JAVASCRIPTS setting.", package)
+        if package not in JAVASCRIPTS.keys():
+            raise ImproperlyConfigured("%s is not in your DJAMMIT_JAVASCRIPTS setting." % package)
 
 def include_javascript(parser, token):
     bits = token.contents.split()
