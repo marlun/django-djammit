@@ -15,9 +15,13 @@ def concatenate(paths):
 def get_template_name(path, base_path):
     extension = settings.JST_EXTENSION
 
+    name = os.path.basename(path)
+
     if not base_path:
-        return os.path.basename(path)
-    return re.sub(base_path + '(.*)' + extension, r"\1", path)
+        return name
+
+    # removing the extension
+    return name.replace(extension, "")
 
 def compile_jst(paths):
     bits = {
