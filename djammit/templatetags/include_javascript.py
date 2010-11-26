@@ -54,7 +54,8 @@ def get_tags(packages):
     return javascript_include_tag(urls)
 
 def run_collectstatic():
-    management.call_command('collectstatic', interactive=False)
+    command = settings.DJAMMIT_COLLECT_COMMAND
+    management.call_command(command, interactive=False)
 
 def validate_packages(packages):
     for package in packages:
