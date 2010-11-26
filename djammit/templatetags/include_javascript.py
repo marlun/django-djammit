@@ -60,6 +60,10 @@ def get_tags(packages):
     return javascript_include_tag(urls)
 
 def run_collectstatic():
+    # ensure ROOT exists, in case it's used by staticfiles
+    if not os.path.exists(ROOT):
+        os.mkdir(ROOT)
+
     management.call_command(COLLECT_COMMAND, interactive=False)
 
 def validate_packages(packages):
