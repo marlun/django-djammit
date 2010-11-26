@@ -38,20 +38,23 @@ def get_paths(package):
 
 def get_urls_for(package):
     urls = []
+    base_path = settings.STATIC_ROOT + '/'
+
     paths = get_paths(package)
-    scripts = [path for path in paths if os.path.splitext(path)[1] == '.js']
-    scripts = map(lambda s: s.replace(settings.STATIC_ROOT + '/', ''), scripts)
+
+    scripts = [p.replace(base_path, '') for p in paths if p.endswith('.js')]
     for path in scripts:
         urls.append(settings.STATIC_URL + path)
-    templates = [path for path in paths if os.path.splitext(path)[1] == '.jst']
-    if len(templates) > 0:
+
+    templates = [path for path in paths if path.endswith(settings.JST_EXTENSION)]
+    if len(templates):
         urls.append(settings.STATIC_URL + package + ".js")
+
     return urls
 
 def get_tags(packages):
-    urls = []
-    for package in packages:
-        urls += get_urls_for(package)
+    urls = [get_urls_for(package) for package in packages]
+    urls = reduce(lambda x,y: x+y, urls) # flatten the list of lists
     return javascript_include_tag(urls)
 
 def run_collectstatic():
