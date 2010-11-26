@@ -4,7 +4,7 @@ from django.core import management
 from djammit import settings
 from djammit.finders import filefinder
 from djammit.compressor import compile_assets
-from djammit.utils import javascript_include_tag, remove_dups
+from djammit.utils import javascript_include_tag
 
 register = template.Library()
 
@@ -28,12 +28,12 @@ def compile_packages(packages):
         pack(compiled, package)
 
 def get_paths(package):
-    paths = []
+    paths = set()
     patterns = settings.JAVASCRIPTS[package]
     for pattern in patterns:
-        paths.extend(filefinder(pattern))
+        paths.update(filefinder(pattern))
 
-    return remove_dups(paths)
+    return [p for p in paths]
 
 def get_urls_for(package):
     urls = []
