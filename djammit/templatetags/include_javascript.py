@@ -2,10 +2,12 @@ import os
 from django import template
 from django.core import management
 from django.core.exceptions import ImproperlyConfigured
-from djammit import settings
 from djammit.finders import filefinder
 from djammit.compressor import compile_assets
 from djammit.utils import javascript_include_tag, remove_dups
+
+from djammit.settings import ROOT, JAVASCRIPTS, TEMPLATE_EXTENSION, \
+    STATIC_ROOT, STATIC_URL, COLLECT_COMMAND
 
 register = template.Library()
 
@@ -30,7 +32,7 @@ def compile_packages(packages):
 
 def get_paths(package):
     paths = []
-    patterns = settings.JAVASCRIPTS[package]
+    patterns = JAVASCRIPTS[package]
     for pattern in patterns:
         paths.extend(filefinder(pattern))
 
@@ -38,17 +40,17 @@ def get_paths(package):
 
 def get_urls_for(package):
     urls = []
-    base_path = settings.STATIC_ROOT + '/'
+    base_path = STATIC_ROOT + '/'
 
     paths = get_paths(package)
 
     scripts = [p.replace(base_path, '') for p in paths if p.endswith('.js')]
     for path in scripts:
-        urls.append(settings.STATIC_URL + path)
+        urls.append(STATIC_URL + path)
 
-    templates = [path for path in paths if path.endswith(settings.JST_EXTENSION)]
+    templates = [path for path in paths if path.endswith(TEMPLATE_EXTENSION)]
     if len(templates):
-        urls.append(settings.STATIC_URL + package + ".js")
+        urls.append(STATIC_URL + package + ".js")
 
     return urls
 
@@ -58,8 +60,7 @@ def get_tags(packages):
     return javascript_include_tag(urls)
 
 def run_collectstatic():
-    command = settings.DJAMMIT_COLLECT_COMMAND
-    management.call_command(command, interactive=False)
+    management.call_command(COLLECT_COMMAND, interactive=False)
 
 def validate_packages(packages):
     for package in packages:
@@ -69,7 +70,7 @@ def validate_packages(packages):
 def include_javascript(parser, token):
     bits = token.contents.split()
     validate_packages(bits[1:])
-    packages = bits[1:] if len(bits) > 1 else settings.JAVASCRIPTS.keys()
+    packages = bits[1:] if len(bits) > 1 else JAVASCRIPTS.keys()
 
     run_collectstatic()
 

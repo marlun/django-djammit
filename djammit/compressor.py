@@ -1,6 +1,5 @@
 import os
-
-from djammit import settings
+from settings import TEMPLATE_EXTENSION, TEMPLATE_NAMESPACE, TEMPLATE_FUNCTION, DEBUG
 
 JST_START = "(function(){"
 JST_END = "})();"
@@ -12,7 +11,7 @@ def compile_js(paths):
     return "".join(map(readfile, paths))
 
 def get_template_name(path, base_path):
-    extension = settings.JST_EXTENSION
+    extension = TEMPLATE_EXTENSION
 
     name = os.path.basename(path)
 
@@ -24,13 +23,13 @@ def get_template_name(path, base_path):
 
 def compile_jst(paths):
     bits = {
-        'namespace': settings.JST_NAMESPACE,
+        'namespace': TEMPLATE_NAMESPACE,
     }
     namespace_setup = "%(namespace)s = %(namespace)s || {};" % bits
 
     # do we generate a wrapper function or just pass the string along?
-    if settings.JST_FUNCTION:
-        bits['template_func'] = settings.JST_FUNCTION
+    if TEMPLATE_FUNCTION:
+        bits['template_func'] = TEMPLATE_FUNCTION
         format = "%(namespace)s['%(name)s'] = %(template_func)s('%(template)s');"
     else:
         format = "%(namespace)s['%(name)s'] = '%(template)s';"
@@ -58,7 +57,7 @@ def compile_assets(paths):
     assets = {
         '.js': [],
         '.css': [],
-        settings.JST_EXTENSION: [],
+        TEMPLATE_EXTENSION: [],
     }
 
     for path in paths:
@@ -68,10 +67,10 @@ def compile_assets(paths):
                 break
 
     # compile templates
-    compiled += compile_jst(assets[settings.JST_EXTENSION])
+    compiled += compile_jst(assets[TEMPLATE_EXTENSION])
 
     # compile scripts
-    if not settings.DEBUG:
+    if not DEBUG:
         compiled += compile_js(assets['.js'])
     return compiled
 
