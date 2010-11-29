@@ -10,10 +10,10 @@ VERY EARLY ALPHA RELASE! Actually, it might not work at all.
 Usage
 =====
 
-You need to set a JAVSCRIPTS dictionary in your settings file which lists packages
+You need to set a DJAMMIT_JAVSCRIPTS dictionary in your settings file which lists packages
 and files which Djammit should add to the specific packages.::
 
-    JAVASCRIPTS = {
+    DJAMMIT_JAVASCRIPTS = {
         'core': (
             'js/libs/jquery-*.js',
             'js/libs/underscore*.js',
@@ -30,5 +30,5 @@ javascript include tags. It will also run Django's management command ``collects
 every request which will move changed files to your static root folder.
 
 As you can see in the above example the last pattern will include javascript templates
-(*.jst). The templates will be included in a file named after the package (core.js in
+(\*.jst). The templates will be included in a file named after the package (core.js in
 this case).
