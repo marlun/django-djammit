@@ -7,6 +7,10 @@ include tags in your django apps.
 
 VERY EARLY ALPHA RELASE! Actually, it might not work at all.
 
+The name Djammit and the code (or atleast the ideas) has pretty much been ripped from
+`DocumentCloud's Jammit <http://documentcloud.github.com/jammit/>` which is a much more 
+advanced and mature tool for Ruby on Rails.
+
 Usage
 =====
 
