@@ -30,6 +30,8 @@ if not hasattr(settings, 'DJAMMIT_COLLECT_COMMAND'):
         COLLECT_COMMAND = 'build_static'
     elif 'django.contrib.staticfiles' in apps:
         COLLECT_COMMAND = 'collectstatic'
+    else:
+        COLLECT_COMMAND = None
 else:
     COLLECT_COMMAND = settings.DJAMMIT_COLLECT_COMMAND
 

@@ -76,7 +76,8 @@ def include_javascript(parser, token):
     validate_packages(bits[1:])
     packages = bits[1:] if len(bits) > 1 else JAVASCRIPTS.keys()
 
-    run_collectstatic()
+    if COLLECT_COMMAND is not None:
+        run_collectstatic()
 
     compile_packages(packages)
 
